@@ -27,4 +27,10 @@ const del = async id => {
   return response.data
 }
 
-export default { getAll, create, setToken, del }
+const update = async newObject => {
+  // with the backend I made in Part 4, just sending likes will work if you only want to be able to give the blog a like
+  const response = await axios.put(`${baseUrl}/${newObject.id.toString()}`, {likes: newObject.likes})
+  return response.data
+}
+
+export default { getAll, create, setToken, del, update }

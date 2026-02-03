@@ -63,6 +63,7 @@ const App = () => {
         const newBlog = await blogService.create(blog)
         setBlogs(blogs.concat(newBlog))
         setCreateVisible(false)
+        window.location.reload()
         sendMessage(`Blog ${newBlog.title} has been created`)
     } catch {
         sendMessage("blog creation failed")
@@ -70,6 +71,7 @@ const App = () => {
   }
 
   const deleteBlog = async (id) => {
+    if (window.confirm("Delete the blog?")) {
     try {
         await blogService.del(id)
         const newBlogs = blogs.filter(blog => blog.id.toString() != id)
@@ -77,6 +79,20 @@ const App = () => {
         sendMessage("blog has been deleted")
     } catch {
         sendMessage("blog deletion failed")
+    }
+  }}
+
+  const giveLike = async (id) => {
+    try {
+        const blogToLike = blogs.filter(blog => blog.id.toString() == id)[0]
+        blogToLike.likes ++
+        await blogService.update(blogToLike)
+        const newBlogs = blogs.map(blog => (blog.id.toString() == id.toString()) ? blogToLike: blog)
+
+        setBlogs(newBlogs)
+        sendMessage("you have liked a blog")
+    } catch {
+        sendMessage("blog to be liked has been deleted")
     }
   }
 
@@ -87,7 +103,7 @@ const App = () => {
     show: !blog.show}): blog)
         setBlogs(newBlogs)
     } catch {
-        sendMessage("blog has been deleted")
+        sendMessage("blog to expand has been deleted")
     }
   }
 
@@ -108,10 +124,23 @@ const App = () => {
     return (
     <div>
       <Notification message={message}/>
-      <p>Logged in as {user.username}<button onClick={handleLogout} style={{marginLeft: 40}}>Log out</button></p>
-      {createVisible && <BlogForm createBlog={((blog) => createBlog(blog))}/>}
-      <button onClick={(() => setCreateVisible(!createVisible))}>{createVisible ? "Cancel": "Create blog"}</button>
-      <Blogs blogs={blogs} deleteBlog={((id) => {deleteBlog(id)})} showBlog={((id) => {showBlog(id)})}/>
+      <p>
+        Logged in as {user.username}
+        <button onClick={handleLogout} style={{marginLeft: 40}}>Log out</button>
+      </p>
+
+      {createVisible && 
+      <BlogForm createBlog={((blog) => createBlog(blog))}/>}
+
+      <button 
+        onClick={(() => setCreateVisible(!createVisible))}>{createVisible ? "Cancel": "Create blog"}
+      </button>
+
+      <Blogs blogs={blogs}
+        deleteBlog={((id) => {deleteBlog(id)})}
+        showBlog={((id) => {showBlog(id)})}
+        giveLike={((id) => {giveLike(id)})}
+        user={user} />
     </div>
   )
   }
