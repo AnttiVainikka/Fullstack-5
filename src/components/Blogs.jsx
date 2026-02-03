@@ -16,29 +16,30 @@ const Blog = ({ blog, deleteBlog, showBlog, giveLike, user }) => {
       <form>
         <h3>{blog.title} - {blog.author}
           <button id={blog.id.toString()} type="submit" onClick={handleShowChange}
-            style={{marginLeft: 20}}>{blog.show ? "Hide": "Expand"}</button>
-          {(user.username == blog.user.username) && 
+            style={{ marginLeft: 20 }}>{ blog.show ? "Hide": "Expand" }</button>
+          {(user.username === blog.user.username) &&
           <button id={blog.id.toString()} type="submit" onClick={handleBlogDelete}
-            style={{marginLeft: 10}}>Delete</button>}
-          </h3>
+            style={{ marginLeft: 10 }}>Delete</button>}
+        </h3>
         {blog.show && <div>
-        <a href={blog.url}>{blog.url}</a>
-        <p>likes {blog.likes} <button id={blog.id.toString()} onClick={handleLikeChange}>like</button></p>
-        <p>{blog.user.username}</p>
-        
+          <a href={ blog.url }>{ blog.url }</a>
+          <p>likes { blog.likes } <button id={ blog.id.toString() } onClick={ handleLikeChange }>like</button></p>
+          <p>{blog.user.username}</p>
+
         </div>}
-        
+
       </form>
-    </div>  
-)}
+    </div>
+  )}
 
 const Blogs = ({ blogs, deleteBlog, showBlog, giveLike, user }) => (
-    <div>
+  <div>
     <h1>blogs</h1>
     {blogs.sort((a,b) => b.likes - a.likes).map(blog =>
-        <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} showBlog={showBlog} giveLike={giveLike} user={user} />
-      )}
-    </div>
+      <Blog key={ blog.id } blog={ blog } deleteBlog={ deleteBlog }
+        showBlog={ showBlog } giveLike={ giveLike } user={ user } />
+    )}
+  </div>
 )
 
 export default Blogs

@@ -17,7 +17,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -31,9 +31,9 @@ const App = () => {
 
   const sendMessage = (text) => {
     setMessage(text)
-      setTimeout(() => {
-        setMessage(null)
-      }, 5000)
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
   }
 
   const handleLogin = async event => {
@@ -60,50 +60,50 @@ const App = () => {
 
   const createBlog = async (blog) => {
     try {
-        const newBlog = await blogService.create(blog)
-        setBlogs(blogs.concat(newBlog))
-        setCreateVisible(false)
-        window.location.reload()
-        sendMessage(`Blog ${newBlog.title} has been created`)
+      const newBlog = await blogService.create(blog)
+      setBlogs(blogs.concat(newBlog))
+      setCreateVisible(false)
+      window.location.reload()
+      sendMessage(`Blog ${newBlog.title} has been created`)
     } catch {
-        sendMessage("blog creation failed")
+      sendMessage("blog creation failed")
     }
   }
 
   const deleteBlog = async (id) => {
     if (window.confirm("Delete the blog?")) {
-    try {
+      try {
         await blogService.del(id)
-        const newBlogs = blogs.filter(blog => blog.id.toString() != id)
+        const newBlogs = blogs.filter(blog => blog.id.toString() !== id)
         setBlogs(newBlogs)
         sendMessage("blog has been deleted")
-    } catch {
+      } catch {
         sendMessage("blog deletion failed")
-    }
-  }}
+      }
+    }}
 
   const giveLike = async (id) => {
     try {
-        const blogToLike = blogs.filter(blog => blog.id.toString() == id)[0]
-        blogToLike.likes ++
-        await blogService.update(blogToLike)
-        const newBlogs = blogs.map(blog => (blog.id.toString() == id.toString()) ? blogToLike: blog)
+      const blogToLike = blogs.filter(blog => blog.id.toString() === id)[0]
+      blogToLike.likes ++
+      await blogService.update(blogToLike)
+      const newBlogs = blogs.map(blog => (blog.id.toString() === id.toString()) ? blogToLike: blog)
 
-        setBlogs(newBlogs)
-        sendMessage("you have liked a blog")
+      setBlogs(newBlogs)
+      sendMessage("you have liked a blog")
     } catch {
-        sendMessage("blog to be liked has been deleted")
+      sendMessage("blog to be liked has been deleted")
     }
   }
 
   const showBlog = (id) => {
     try {
-        const newBlogs = blogs.map(blog => (blog.id.toString() == id) ? ({
-    ...blog,
-    show: !blog.show}): blog)
-        setBlogs(newBlogs)
+      const newBlogs = blogs.map(blog => (blog.id.toString() === id) ? ({
+        ...blog,
+        show: !blog.show }): blog)
+      setBlogs(newBlogs)
     } catch {
-        sendMessage("blog to expand has been deleted")
+      sendMessage("blog to expand has been deleted")
     }
   }
 
@@ -112,37 +112,37 @@ const App = () => {
       <div>
         <Notification message={message}/>
         <Login
-            username={username}
-            password={password}
-            handleUsernameChange={({ target }) => setUsername(target.value)}
-            handlePasswordChange={({ target }) => setPassword(target.value)}
-            handleSubmit={handleLogin}
-          />
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleSubmit={handleLogin}
+        />
       </div>
     )
   } else {
     return (
-    <div>
-      <Notification message={message}/>
-      <p>
-        Logged in as {user.username}
-        <button onClick={handleLogout} style={{marginLeft: 40}}>Log out</button>
-      </p>
+      <div>
+        <Notification message={message}/>
+        <p>
+          Logged in as {user.username}
+          <button onClick={ handleLogout } style={{ marginLeft: 40 }}>Log out</button>
+        </p>
 
-      {createVisible && 
-      <BlogForm createBlog={((blog) => createBlog(blog))}/>}
+        {createVisible &&
+        <BlogForm createBlog={((blog) => createBlog(blog))}/>}
 
-      <button 
-        onClick={(() => setCreateVisible(!createVisible))}>{createVisible ? "Cancel": "Create blog"}
-      </button>
+        <button
+          onClick={(() => setCreateVisible(!createVisible))}>{createVisible ? "Cancel": "Create blog"}
+        </button>
 
-      <Blogs blogs={blogs}
-        deleteBlog={((id) => {deleteBlog(id)})}
-        showBlog={((id) => {showBlog(id)})}
-        giveLike={((id) => {giveLike(id)})}
-        user={user} />
-    </div>
-  )
+        <Blogs blogs={blogs}
+          deleteBlog={((id) => {deleteBlog(id)})}
+          showBlog={((id) => {showBlog(id)})}
+          giveLike={((id) => {giveLike(id)})}
+          user={user} />
+      </div>
+    )
   }
 }
 
