@@ -18,12 +18,32 @@ const App = () => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
     )  
+  }, [blogs])
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
+    }
   }, [])
+
+  const handleBlogChange = (target) => {
+    const changedBlog = {}
+    changedBlog.title = (target.id == "title") ? target.value: blog.title
+    changedBlog.author = (target.id == "author") ? target.value: blog.author
+    changedBlog.url = (target.id == "url") ? target.value: blog.url
+    setBlog(changedBlog)
+  }
 
   const handleLogin = async event => {
     event.preventDefault()
     try {
       const user = await loginService.login({ username, password })
+      window.localStorage.setItem(
+        "loggedBlogAppUser", JSON.stringify(user)
+      )
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -34,15 +54,6 @@ const App = () => {
         setErrorMessage(null)
       }, 5000)
     }
-  }
-
-  const handleBlogChange = (target) => {
-    const changedBlog = {}
-
-    changedBlog.title = (target.id == "title") ? target.value: blog.title
-    changedBlog.author = (target.id == "author") ? target.value: blog.author
-    changedBlog.url = (target.id == "url") ? target.value: blog.url
-    setBlog(changedBlog)
   }
 
   const handleBlogPost = async event => {
@@ -57,6 +68,13 @@ const App = () => {
         setErrorMessage(null)
       }, 5000)
     }
+  }
+
+  const handleBlogDelete = async event => {
+    event.preventDefault()
+    blogService.del(event.target.id)
+    const newBlogs = blogs.filter(blog => blog.id.toString() != event.target.id)
+    setBlogs(newBlogs)
   }
 
   return (
@@ -74,7 +92,7 @@ const App = () => {
       handleBlogChange={({ target }) => handleBlogChange(target)}
       handleSubmit={handleBlogPost}
       />}
-      {user && <Blogs blogs={blogs}/>}
+      {user && <Blogs blogs={blogs} handleSubmit={handleBlogDelete}/>}
     </div>
   )
 }

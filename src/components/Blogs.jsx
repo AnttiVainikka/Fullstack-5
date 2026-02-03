@@ -1,14 +1,18 @@
-const Blog = ({ blog }) => (
+const Blog = ({ blog, handleSubmit }) => (
   <div>
-    {blog.title} {blog.author}
+    <form>
+      <h3>{blog.title} <button id={blog.id.toString()} type="delete" onClick={handleSubmit}>Delete</button></h3>
+      <p>author: {blog.author ? blog.author : blog.user.username}</p>
+      <a href={blog.url}>{blog.url}</a>
+    </form>
   </div>  
 )
 
-const Blogs = ({blogs}) => (
+const Blogs = ({blogs, handleSubmit}) => (
     <div>
-    <h2>blogs</h2>
+    <h1>blogs</h1>
     {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} handleSubmit={handleSubmit} />
       )}
     </div>
   )
