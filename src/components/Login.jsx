@@ -1,7 +1,7 @@
 const Login = ({username, handleUsernameChange,password,handlePasswordChange,handleSubmit}) => {
     return (
     <div>
-        <h2>Login</h2>
+        <h2>Log in to application</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label>

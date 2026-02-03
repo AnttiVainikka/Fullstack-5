@@ -12,7 +12,7 @@ const App = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -28,6 +28,13 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
+  const sendMessage = (text) => {
+    setMessage(text)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+  }
 
   const handleBlogChange = (target) => {
     const changedBlog = {}
@@ -49,10 +56,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch {
-      setErrorMessage('wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      sendMessage("wrong credentials")
     }
   }
 
@@ -68,41 +72,53 @@ const App = () => {
       const newBlog = await blogService.create(blog)
       setBlogs(blogs.concat(newBlog))
       setBlog({})
+      sendMessage(`Blog ${newBlog.title} has been created`)
     } catch {
-      setErrorMessage('blog creation failed')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      sendMessage("blog creation failed")
     }
   }
 
   const handleBlogDelete = async event => {
     event.preventDefault()
-    blogService.del(event.target.id)
-    const newBlogs = blogs.filter(blog => blog.id.toString() != event.target.id)
-    setBlogs(newBlogs)
+    try {
+      blogService.del(event.target.id)
+      const newBlogs = blogs.filter(blog => blog.id.toString() != event.target.id)
+      setBlogs(newBlogs)
+      sendMessage("blog has been deleted")
+    } catch {
+      sendMessage("blog deletion failed")
+    }
+    
   }
-
-  return (
-    <div>
-      <Notification message={errorMessage}/>
-      {!user && <Login
+  if (user === null) {
+    return (
+      <div>
+        <Notification message={message}/>
+        <Login
             username={username}
             password={password}
             handleUsernameChange={({ target }) => setUsername(target.value)}
             handlePasswordChange={({ target }) => setPassword(target.value)}
             handleSubmit={handleLogin}
-      />}
-      {user && <BlogForm
-      blog={blog}
-      handleBlogChange={({ target }) => handleBlogChange(target)}
-      handleSubmit={handleBlogPost}
-      />}
-      {user && <Blogs blogs={blogs} handleSubmit={handleBlogDelete}/>}
-      <br></br>
-      {user && <button onClick={handleLogout}>Log out</button>}
+          />
+      </div>
+    )
+  } else {
+    return (
+    <div>
+      <Notification message={message}/>
+      <p>Logged in as {user.username}             <button onClick={handleLogout}>Log out</button></p>
+      <BlogForm 
+        blog={blog}
+        handleBlogChange={({ target }) => handleBlogChange(target)}
+        handleSubmit={handleBlogPost}
+      />
+      <Blogs blogs={blogs} handleSubmit={handleBlogDelete}/>
+      
     </div>
   )
+  }
+  
 }
 
 export default App
