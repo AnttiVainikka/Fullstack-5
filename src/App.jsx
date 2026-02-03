@@ -56,6 +56,12 @@ const App = () => {
     }
   }
 
+  const handleLogout = event => {
+    event.preventDefault()
+    window.localStorage.removeItem('loggedBlogAppUser')
+    setUser(null)
+  }
+
   const handleBlogPost = async event => {
     event.preventDefault()
     try {
@@ -93,6 +99,8 @@ const App = () => {
       handleSubmit={handleBlogPost}
       />}
       {user && <Blogs blogs={blogs} handleSubmit={handleBlogDelete}/>}
+      <br></br>
+      {user && <button onClick={handleLogout}>Log out</button>}
     </div>
   )
 }
