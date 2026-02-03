@@ -8,17 +8,17 @@ import loginService from "./services/login"
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [blog, setBlog] = useState({})
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [user, setUser] = useState(null)
   const [message, setMessage] = useState(null)
+  const [createVisible, setCreateVisible] = useState(false)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
     )  
-  }, [blogs])
+  }, [])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
@@ -34,14 +34,6 @@ const App = () => {
       setTimeout(() => {
         setMessage(null)
       }, 5000)
-  }
-
-  const handleBlogChange = (target) => {
-    const changedBlog = {}
-    changedBlog.title = (target.id == "title") ? target.value: blog.title
-    changedBlog.author = (target.id == "author") ? target.value: blog.author
-    changedBlog.url = (target.id == "url") ? target.value: blog.url
-    setBlog(changedBlog)
   }
 
   const handleLogin = async event => {
@@ -66,30 +58,39 @@ const App = () => {
     setUser(null)
   }
 
-  const handleBlogPost = async event => {
-    event.preventDefault()
+  const createBlog = async (blog) => {
     try {
-      const newBlog = await blogService.create(blog)
-      setBlogs(blogs.concat(newBlog))
-      setBlog({})
-      sendMessage(`Blog ${newBlog.title} has been created`)
+        const newBlog = await blogService.create(blog)
+        setBlogs(blogs.concat(newBlog))
+        setCreateVisible(false)
+        sendMessage(`Blog ${newBlog.title} has been created`)
     } catch {
-      sendMessage("blog creation failed")
+        sendMessage("blog creation failed")
     }
   }
 
-  const handleBlogDelete = async event => {
-    event.preventDefault()
+  const deleteBlog = async (id) => {
     try {
-      blogService.del(event.target.id)
-      const newBlogs = blogs.filter(blog => blog.id.toString() != event.target.id)
-      setBlogs(newBlogs)
-      sendMessage("blog has been deleted")
+        await blogService.del(id)
+        const newBlogs = blogs.filter(blog => blog.id.toString() != id)
+        setBlogs(newBlogs)
+        sendMessage("blog has been deleted")
     } catch {
-      sendMessage("blog deletion failed")
+        sendMessage("blog deletion failed")
     }
-    
   }
+
+  const showBlog = (id) => {
+    try {
+        const newBlogs = blogs.map(blog => (blog.id.toString() == id) ? ({
+    ...blog,
+    show: !blog.show}): blog)
+        setBlogs(newBlogs)
+    } catch {
+        sendMessage("blog has been deleted")
+    }
+  }
+
   if (user === null) {
     return (
       <div>
@@ -107,18 +108,13 @@ const App = () => {
     return (
     <div>
       <Notification message={message}/>
-      <p>Logged in as {user.username}             <button onClick={handleLogout}>Log out</button></p>
-      <BlogForm 
-        blog={blog}
-        handleBlogChange={({ target }) => handleBlogChange(target)}
-        handleSubmit={handleBlogPost}
-      />
-      <Blogs blogs={blogs} handleSubmit={handleBlogDelete}/>
-      
+      <p>Logged in as {user.username}<button onClick={handleLogout} style={{marginLeft: 40}}>Log out</button></p>
+      {createVisible && <BlogForm createBlog={((blog) => createBlog(blog))}/>}
+      <button onClick={(() => setCreateVisible(!createVisible))}>{createVisible ? "Cancel": "Create blog"}</button>
+      <Blogs blogs={blogs} deleteBlog={((id) => {deleteBlog(id)})} showBlog={((id) => {showBlog(id)})}/>
     </div>
   )
   }
-  
 }
 
 export default App
