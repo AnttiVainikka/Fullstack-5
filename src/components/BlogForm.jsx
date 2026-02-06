@@ -22,10 +22,31 @@ const BlogForm = ({ createBlog }) => {
   blog.url = blog.url ? blog.url: ""
   return (
     <form onSubmit={addBlog}>
-      <p>Title <input id="title" value={ blog.title } onChange={({ target }) => handleBlogChange(target)} required/></p>
-      <p>Author <input id="author" value={ blog.author } onChange={({ target }) => handleBlogChange(target)} required/></p>
-      <p>URL <input id="url" value={ blog.url } onChange={({ target }) => handleBlogChange(target)} required/>
-        <button type="Submit" style={{ marginLeft: 40 }}>Create Blog</button></p>
+      <p>
+        <label>
+          Title:
+          <input id="title" value={ blog.title }
+            onChange={({ target }) => handleBlogChange(target)}
+            required style={{ marginLeft: 10 }}/>
+        </label>
+      </p>
+      <p>
+        <label>
+          Author:
+          <input id="author" value={ blog.author }
+            onChange={({ target }) => handleBlogChange(target)}
+            required style={{ marginLeft: 10 }}/>
+        </label>
+      </p>
+      <p>
+        <label>
+          URL
+          <input id="url" value={ blog.url }
+            onChange={({ target }) => handleBlogChange(target)}
+            required style={{ marginLeft: 10 }}/>
+        </label>
+      </p>
+      <button type="Submit">Create Blog</button>
     </form>
   )
 }
